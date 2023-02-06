@@ -1,0 +1,11 @@
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\bin\Debug\SwitchMonitorInputsPS4.exe.config
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\bin\Debug\SwitchMonitorInputsPS4.exe
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\bin\Debug\SwitchMonitorInputsPS4.pdb
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\obj\Debug\SwitchMonitorInputsPS4.Form1.resources
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\obj\Debug\SwitchMonitorInputsPS4.Properties.Resources.resources
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\obj\Debug\SwitchMonitorInputsPS4.csproj.GenerateResource.cache
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\obj\Debug\SwitchMonitorInputsPS4.exe
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\obj\Debug\SwitchMonitorInputsPS4.pdb
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\obj\Debug\SwitchMonitorInputsPS4.csproj.AssemblyReference.cache
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\obj\Debug\SwitchMonitorInputsPS4.csproj.SuggestedBindingRedirects.cache
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\obj\Debug\SwitchMonitorInputsPS4.csproj.CoreCompileInputs.cache
