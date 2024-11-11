@@ -11,7 +11,6 @@ namespace SwitchMonitorInputsPS4
     public partial class Form1 : Form
     {
         private MMDevice microphoneDevice;
-        private const string micInputName = "Mic in at rear panel (Pink)";
         static string RegistryPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Capture\{697a777f-ec79-4030-bd99-456d28ce5e62}\Properties";
         public Form1()
         {
@@ -61,11 +60,15 @@ namespace SwitchMonitorInputsPS4
                             enable = true;
                         }
                     }
+
+                    // Notify audio system or restart audio services if necessary
+
+                    // You might need to restart audio services or notify the system about changes
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: \n\n{0}", ex.Message);
+                // Handle exceptions
             }
         }
 
@@ -89,7 +92,7 @@ namespace SwitchMonitorInputsPS4
 
             foreach (MMDevice device in devices)
             {
-                if (device.DeviceFriendlyName.Contains(micInputName)) // Replace your microphone name with the actual name of your microphone
+                if (device.DeviceFriendlyName.Contains("Mic in at rear panel (Pink)")) // Replace "YourMicrophoneName" with the actual name of your microphone
                 {
                     microphoneDevice = device;
                     break;

@@ -7,5 +7,12 @@ C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\obj\De
 C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\obj\Debug\SwitchMonitorInputsPS4.exe
 C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\obj\Debug\SwitchMonitorInputsPS4.pdb
 C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\obj\Debug\SwitchMonitorInputsPS4.csproj.AssemblyReference.cache
-C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\obj\Debug\SwitchMonitorInputsPS4.csproj.SuggestedBindingRedirects.cache
 C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\obj\Debug\SwitchMonitorInputsPS4.csproj.CoreCompileInputs.cache
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\bin\Debug\Microsoft.Win32.Registry.dll
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\bin\Debug\System.Security.AccessControl.dll
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\bin\Debug\System.Security.Principal.Windows.dll
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\bin\Debug\Microsoft.Win32.Registry.xml
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\bin\Debug\System.Security.AccessControl.xml
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\bin\Debug\System.Security.Principal.Windows.xml
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\obj\Debug\SwitchMonitorInputsPS4.csproj.CopyComplete
+C:\Users\Gamer\source\repos\SwitchMonitorInputsPS4\SwitchMonitorInputsPS4\bin\Debug\CoreAudio.dll
