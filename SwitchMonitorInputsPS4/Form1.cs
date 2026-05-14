@@ -1,10 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Diagnostics;
-using Microsoft.Win32;
+﻿using System; 
+using System.Diagnostics; 
+using System.Linq; 
+using System.Windows.Forms; 
+using Microsoft.Win32; 
 using CoreAudio;
-using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace SwitchMonitorInputsPS4
 {
@@ -12,208 +12,116 @@ namespace SwitchMonitorInputsPS4
     {
         private MMDevice microphoneDevice;
         private const string micInputName = "Mic in at rear panel (Pink)";
-        static string RegistryPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Capture\{697a777f-ec79-4030-bd99-456d28ce5e62}\Properties";
+        private const string RegistryPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Capture\{697a777f-ec79-4030-bd99-456d28ce5e62}\Properties";
+        private const string RegistryKey = "{24dbb0fc-9311-4b3d-9cf0-18ff155639d4},1";
+
         public Form1()
         {
             InitializeComponent();
+            this.KeyPreview = true;
+            this.KeyDown += Form1_KeyDown;
         }
-
-        private void SetMicrophoneVolume(string microphoneName, float volumeLevel)
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            MMDeviceEnumerator enumerator = new MMDeviceEnumerator(Guid.Empty);
-            MMDeviceCollection devices = enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
-
-            foreach (MMDevice device in devices)
+            if (e.KeyCode == Keys.OemBackslash || e.KeyCode == Keys.Oem5)
             {
-                if (device.DeviceFriendlyName.Contains(microphoneName))
-                {
-                    device.AudioEndpointVolume.MasterVolumeLevelScalar = volumeLevel;
-                    MessageBox.Show("Volume set successfully.");
-                    return;
-                }
+                checkBox1.Checked = !checkBox1.Checked;
             }
         }
-        [Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")]
-        internal class MMDeviceEnumeratorComObject { }
+
+        private void RunCommand(string arguments) =>
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "cmd.exe",
+                Arguments = arguments,
+                WindowStyle = ProcessWindowStyle.Hidden
+            });
+
+        private MMDevice GetMicrophoneDevice() =>
+            new MMDeviceEnumerator(Guid.Empty)
+                .EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active)
+                .FirstOrDefault(d => d.DeviceFriendlyName.Contains(micInputName));
+
+        private void SetMicrophoneVolume(float volumeLevel)
+        {
+            if (microphoneDevice != null)
+                microphoneDevice.AudioEndpointVolume.MasterVolumeLevelScalar = volumeLevel;
+        }
 
         public static void ToggleListenToDevice(bool enable)
         {
             try
             {
-                RegistryKey key = Registry.LocalMachine.OpenSubKey(RegistryPath, true);
-
-                if (key != null)
+                using (var key = Registry.LocalMachine.OpenSubKey(RegistryPath, true))
                 {
-                    if (enable)
-                    {
-                        Byte[] value = new byte[] { 0x0b, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-                        key.SetValue("{24dbb0fc-9311-4b3d-9cf0-18ff155639d4},1", value, RegistryValueKind.Binary);
-                        key.Close();
-                        enable = false;
-                    }
-                    else
-                    {
-                        if (!enable) 
-                        {
-                            Byte[] value = new byte[] { 0x0b, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00 };
-                            key.SetValue("{24dbb0fc-9311-4b3d-9cf0-18ff155639d4},1", value, RegistryValueKind.Binary);
-                            key.Close();
-                            enable = true;
-                        }
-                    }
+                    if (key == null) return;
+
+                    byte[] value = { 0x0b, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
+                                    (byte)(enable ? 0x00 : 0xFF), (byte)(enable ? 0x00 : 0xFF), 0x00, 0x00 };
+                    key.SetValue(RegistryKey, value, RegistryValueKind.Binary);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: \n\n{0}", ex.Message);
+                MessageBox.Show($"Error: \n\n{ex.Message}");
             }
         }
 
-        public async void RestartExplorer()
+        private void RefreshVolumeLevel()
         {
-            await Task.Delay(5000);
-            Process p = new Process();
-            foreach (Process exe in Process.GetProcesses())
-            {
-                if (exe.ProcessName == "explorer")
-                    exe.Kill();
-            }
-            await Task.Delay(1500);
-            Process.Start("explorer.exe");
-        }
-
-        private void refreshVolumeLevel()
-        {
-            MMDeviceEnumerator enumerator = new MMDeviceEnumerator(Guid.Empty);
-            MMDeviceCollection devices = enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
-
-            foreach (MMDevice device in devices)
-            {
-                if (device.DeviceFriendlyName.Contains(micInputName)) // Replace your microphone name with the actual name of your microphone
-                {
-                    microphoneDevice = device;
-                    break;
-                }
-            }
+            microphoneDevice = GetMicrophoneDevice();
 
             if (microphoneDevice == null)
             {
                 MessageBox.Show("Microphone not found.");
                 return;
             }
+
             int volumeLevel = (int)(microphoneDevice.AudioEndpointVolume.MasterVolumeLevelScalar * 100);
             trackBar1.Value = volumeLevel;
-            label1.Text = "Volume: " + volumeLevel + "%";
+            label1.Text = $"Volume: {volumeLevel}%";
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            refreshVolumeLevel();
-            //RegistryKey key = Registry.LocalMachine.OpenSubKey(RegistryPath);
-            //if (key != null)
-            //{
-            //    byte[] Data = (byte[])key.GetValue("{24dbb0fc-9311-4b3d-9cf0-18ff155639d4},1", RegistryValueKind.Binary);
-            //    byte val = Convert.ToByte(Data);
-            //    MessageBox.Show(val.ToString());
-            //}
-            //else
-            //{
-            //    MessageBox.Show("key is null");
-            //}
-        }
+        private void Form1_Load(object sender, EventArgs e) => RefreshVolumeLevel();
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Process process = new System.Diagnostics.Process();
-            ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            startInfo.FileName = @"C:\Windows\system32\cmd.exe";
-            startInfo.Arguments = "/C ControlMyMonitor.exe /SetValue Secondary 60 17";
-            process.StartInfo = startInfo;
-            process.Start();
-
-            Process process2 = new System.Diagnostics.Process();
-            ProcessStartInfo startInfo2 = new System.Diagnostics.ProcessStartInfo();
-            startInfo2.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            startInfo2.FileName = @"C:\Windows\system32\cmd.exe";
-            startInfo2.Arguments = @"/C DisplaySwitch.exe 1";
-            process2.StartInfo = startInfo2;
-            process2.Start();
-
-            //RestartExplorer();
+            RunCommand("/C ControlMyMonitor.exe /SetValue Secondary 60 17");
+            RunCommand("/C DisplaySwitch.exe 1");
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Process process = new System.Diagnostics.Process();
-            ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = "/C ControlMyMonitor.exe /SetValue Secondary 60 15";
-            process.StartInfo = startInfo;
-            process.Start();
-
-            Process process2 = new System.Diagnostics.Process();
-            ProcessStartInfo startInfo2 = new System.Diagnostics.ProcessStartInfo();
-            startInfo2.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            startInfo2.FileName = "cmd.exe";
-            startInfo2.Arguments = @"/C DisplaySwitch.exe /extend";
-            process2.StartInfo = startInfo2;
-            process2.Start();
-
-            if (microphoneDevice != null)
+            RunCommand("/C ControlMyMonitor.exe /SetValue Secondary 60 15");
+            RunCommand("/C DisplaySwitch.exe /extend");
+            SetMicrophoneVolume(0.0f);
+            Task.Delay(500);
+            var explorerProcesses = Process.GetProcessesByName("explorer");
+            foreach (var process in explorerProcesses)
             {
-                microphoneDevice.AudioEndpointVolume.MasterVolumeLevelScalar = 0.0f;
+                process.Kill();
             }
-
-            //RestartExplorer();
+            Task.Delay(200);
+            Process.Start("explorer.exe");
             Process.GetCurrentProcess().Kill();
         }
 
+        private void button3_Click(object sender, EventArgs e) =>
+            RunCommand("/C DisplaySwitch.exe 4");
+
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            if(checkBox1.CheckState == CheckState.Checked)
-            {
-                if (microphoneDevice != null)
-                {
-                    microphoneDevice.AudioEndpointVolume.MasterVolumeLevelScalar = 0.5f;
-                    refreshVolumeLevel();
-                }
-            }
-            else if (checkBox1.CheckState == CheckState.Unchecked)
-            {
-                if (microphoneDevice != null)
-                {
-                    microphoneDevice.AudioEndpointVolume.MasterVolumeLevelScalar = 0.0f;
-                    refreshVolumeLevel();
-                }
-            }
+            SetMicrophoneVolume(checkBox1.Checked ? 0.5f : 0.0f);
+            RefreshVolumeLevel();
         }
 
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
-            float volumeLevel = trackBar1.Value / 100f;
-            microphoneDevice.AudioEndpointVolume.MasterVolumeLevelScalar = volumeLevel;
+            SetMicrophoneVolume(trackBar1.Value / 100f);
             label1.Text = $"Volume: {trackBar1.Value}%";
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (microphoneDevice != null)
-            {
-                microphoneDevice.AudioEndpointVolume.MasterVolumeLevelScalar = 0.0f;
-            }
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            Process process2 = new System.Diagnostics.Process();
-            ProcessStartInfo startInfo2 = new System.Diagnostics.ProcessStartInfo();
-            startInfo2.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            startInfo2.FileName = @"C:\Windows\system32\cmd.exe";
-            startInfo2.Arguments = @"/C DisplaySwitch.exe 4";
-            process2.StartInfo = startInfo2;
-            process2.Start();
-        }
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e) =>
+            SetMicrophoneVolume(0.0f);
     }
 }
